@@ -4,6 +4,7 @@ import BEjava.userAPI.component.RequestContext;
 import BEjava.userAPI.dto.request.CreateUserRequest;
 import BEjava.userAPI.dto.response.UserInfoResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Slf4j
 @Repository
+@ConditionalOnProperty(name = "app.repository-type", havingValue = "mock")
 public class MockUserRepository implements UserRepository {
 
     private final RequestContext requestContext;

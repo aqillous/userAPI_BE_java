@@ -3,6 +3,7 @@ package BEjava.userAPI.service;
 import BEjava.userAPI.component.RecentlyViewedUsers;
 import BEjava.userAPI.component.RequestContext;
 import BEjava.userAPI.component.UserAuditLog;
+import BEjava.userAPI.component.UserStatistics;
 import BEjava.userAPI.dto.request.CreateUserRequest;
 import BEjava.userAPI.dto.response.UserInfoResponse;
 import BEjava.userAPI.repository.UserRepository;
@@ -39,7 +40,7 @@ class UserInfoServiceTest {
         when(auditProvider.getObject()).thenReturn(new UserAuditLog());
 
         service = new UserInfoService(repository, List.of(repository), auditProvider,
-                requestContext, recentlyViewedUsers);
+                requestContext, recentlyViewedUsers, new UserStatistics());
     }
 
     @Test

@@ -6,6 +6,7 @@ import BEjava.userAPI.dto.response.UserInfoResponse;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Repository
+@ConditionalOnProperty(name = "app.repository-type", havingValue = "memory", matchIfMissing = true)
 public class InMemoryUserRepository implements UserRepository {
 
     private final Map<Long , UserInfoResponse> storage = new ConcurrentHashMap<>();
