@@ -2,36 +2,66 @@ package BEjava.userAPI.repository;
 
 import BEjava.userAPI.dto.request.CreateUserRequest;
 import BEjava.userAPI.dto.response.UserInfoResponse;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Slf4j
 @Repository
 public class UserRepository {
 
-    public UserInfoResponse getUserById(Long id){
-        return new UserInfoResponse(
-                id,
-                "test_istifadeci",
-                "user" + id + "@example.com",
-                true,
-                LocalDateTime.now()
-        );
+    private final Map<Long , UserInfoResponse> storage = new ConcurrentHashMap<>();
+    private final AtomicLong idGenerator = new AtomicLong();
+
+    public UserRepository() {
+        log.info("UserRepository yaradildi: {}", this.hashCode());
+    }
+
+    @PostConstruct
+    public void init(){
+        createUser(new CreateUserRequest("Ali Aliyev", "ali@example.com"));
+        createUser(new CreateUserRequest("Leyla Mammadova", "leyla@example.com"));
+        createUser(new CreateUserRequest("Rashad Hasanov", "rashad@example.com"));
+        log.info("UserRepository hazirdir, {} user yuklendi", storage.size());
+    }
+    @PreDestroy
+    public void destroy() {
+        log.info("UserRepository baglanir, storage temizlenir ({} user)", storage.size());
+        storage.clear();
+    }
+
+    public UserInfoResponse getUserById(Long id) {
+        UserInfoResponse user = storage.get(id);
+        if (user == null) {
+            throw new NoSuchElementException("User tapilmadi: id=" + id);
+        }
+        return user;
     }
 
     public List<UserInfoResponse> getAllUsers() {
-        return List.of(getUserById(1L), getUserById(2L), getUserById(3L));
+        return storage.values().stream()
+                .sorted(Comparator.comparing(UserInfoResponse::getId))
+                .toList();
     }
 
-    public UserInfoResponse createUser(CreateUserRequest createUserRequest) {
+    public UserInfoResponse createUser(CreateUserRequest request) {
         UserInfoResponse user = new UserInfoResponse();
-        user.setId(ThreadLocalRandom.current().nextLong(1, 1000));
-        user.setFullName(createUserRequest.getFullName());
-        user.setEmail(createUserRequest.getEmail());
+        user.setId(idGenerator.incrementAndGet());
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
         user.setActive(true);
         user.setCreatedAt(LocalDateTime.now());
+        storage.put(user.getId(), user);
         return user;
     }
 

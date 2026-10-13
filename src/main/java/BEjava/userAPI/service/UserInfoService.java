@@ -3,10 +3,11 @@ package BEjava.userAPI.service;
 import BEjava.userAPI.dto.request.CreateUserRequest;
 import BEjava.userAPI.dto.response.UserInfoResponse;
 import BEjava.userAPI.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Slf4j
 @Service
 public class UserInfoService {
 
@@ -15,6 +16,7 @@ public class UserInfoService {
 
     public UserInfoService(UserRepository userRepository) {
         this.userRepository = userRepository;
+        log.info("UserInfoService yaradildi: {}", this.hashCode());
     }
 
     public UserInfoResponse getUserById(Long id) {
