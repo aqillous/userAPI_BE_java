@@ -1,5 +1,6 @@
 package BEjava.userAPI.controller;
 
+import BEjava.userAPI.component.RequestContext;
 import BEjava.userAPI.dto.request.CreateUserRequest;
 import BEjava.userAPI.dto.response.UserInfoResponse;
 import BEjava.userAPI.service.UserInfoService;
@@ -14,15 +15,24 @@ import java.util.List;
 public class UserInfoController {
 
     private final UserInfoService userInfoService;
+    private final RequestContext requestContext;
 
-    public UserInfoController(UserInfoService userInfoService) {
+    public UserInfoController(UserInfoService userInfoService, RequestContext requestContext) {
         this.userInfoService = userInfoService;
+        this.requestContext = requestContext;
         log.info("UserInfoController yaradildi: {}", this.hashCode());
     }
 
     @GetMapping("/{id}")
     public UserInfoResponse getUserById(@PathVariable Long id) {
-        return userInfoService.getUserById(id);
+        log.info("[Controller] requestId={}", requestContext.getRequestId());
+        log.info("[Controller] requestContext class = {}", requestContext.getClass().getName()); // task 19
+
+        UserInfoResponse response = userInfoService.getUserById(id);
+
+        long elapsed = System.currentTimeMillis() - requestContext.getStartTime();               // task 17
+        log.info("[Controller] requestId={}, sorgu {} ms cekdi", requestContext.getRequestId(), elapsed);
+        return response;
     }
 
     @GetMapping("/all")

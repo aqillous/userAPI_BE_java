@@ -1,5 +1,6 @@
 package BEjava.userAPI.repository;
 
+import BEjava.userAPI.component.RequestContext;
 import BEjava.userAPI.dto.request.CreateUserRequest;
 import BEjava.userAPI.dto.response.UserInfoResponse;
 import jakarta.annotation.PostConstruct;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -22,8 +22,10 @@ public class UserRepository {
 
     private final Map<Long , UserInfoResponse> storage = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong();
+    private final RequestContext requestContext;
 
-    public UserRepository() {
+    public UserRepository(RequestContext requestContext) {
+        this.requestContext = requestContext;
         log.info("UserRepository yaradildi: {}", this.hashCode());
     }
 
