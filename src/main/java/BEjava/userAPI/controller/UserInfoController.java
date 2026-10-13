@@ -45,4 +45,9 @@ public class UserInfoController {
     public UserInfoResponse createUser(@RequestBody CreateUserRequest createUserRequest) {
         return userInfoService.createUser(createUserRequest);
     }
+
+    @GetMapping("/recent")
+    public List<UserInfoResponse> getRecentUsers() {
+        return userInfoService.getRecentUsers();
+    }
 }

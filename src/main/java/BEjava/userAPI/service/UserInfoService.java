@@ -1,5 +1,6 @@
 package BEjava.userAPI.service;
 
+import BEjava.userAPI.component.RecentlyViewedUsers;
 import BEjava.userAPI.component.RequestContext;
 import BEjava.userAPI.component.UserAuditLog;
 import BEjava.userAPI.dto.request.CreateUserRequest;
@@ -17,18 +18,30 @@ public class UserInfoService {
     private final UserRepository userRepository;
     private final ObjectProvider<UserAuditLog> userAuditLogProvider;
     private final RequestContext requestContext;
+    private final RecentlyViewedUsers recentlyViewedUsers;
 
     public UserInfoService(UserRepository userRepository,
-                           ObjectProvider<UserAuditLog> userAuditLogProvider, RequestContext requestContext) {
+                           ObjectProvider<UserAuditLog> userAuditLogProvider,
+                           RequestContext requestContext,
+                           RecentlyViewedUsers recentlyViewedUsers) {
         this.userRepository = userRepository;
         this.userAuditLogProvider = userAuditLogProvider;
         this.requestContext = requestContext;
+        this.recentlyViewedUsers = recentlyViewedUsers;
         log.info("UserInfoService yaradildi: {}", this.hashCode());
     }
 
     public UserInfoResponse getUserById(Long id) {
         log.info("[Service] requestId={}", requestContext.getRequestId());
-        return userRepository.getUserById(id);
+        UserInfoResponse user = userRepository.getUserById(id);
+        recentlyViewedUsers.addUser(id);
+        return user;
+    }
+
+    public List<UserInfoResponse> getRecentUsers() {
+        return recentlyViewedUsers.getUsers().stream()
+                .map(userRepository::getUserById)
+                .toList();
     }
 
     public List<UserInfoResponse> getAllUsers() {
